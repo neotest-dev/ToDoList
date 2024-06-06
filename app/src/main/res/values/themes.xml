@@ -6,4 +6,7 @@
     </style>
 
     <style name="Theme.ToDoList" parent="Base.Theme.ToDoList" />
+    <style name="SplashTheme" parent="Base.Theme.ToDoList">
+        <item name="android:windowBackground">@color/white</item>
+    </style>
 </resources>
