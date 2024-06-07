@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">ToDoList</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Contraseña</string>
+    <string name="login_button">ACCEDER</string>
+    <string name="singUp_button">REGISTRAR</string>
+    <string name="logOut_button">Salir</string>
+    <string name="image_description">Descripción de la imagen</string>
+    <string name="image_description2">Descripción de la imagen2</string>
 </resources>
