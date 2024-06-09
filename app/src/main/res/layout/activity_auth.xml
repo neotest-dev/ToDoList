@@ -5,66 +5,110 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="@color/white"
     tools:context=".AuthActivity">
-    
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="30dp"
         android:contentDescription="@string/image_description"
         android:src="@drawable/logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ImageContrastCheck" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="30dp"
+        android:gravity="center"
+        android:text="@string/title"
+        android:textColor="@color/celeste"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:typeface="serif"
+        android:shadowColor="@color/black"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="6"
+        app:layout_constraintBottom_toTopOf="@+id/emailEditText"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <EditText
         android:id="@+id/emailEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="120dp"
         android:layout_marginEnd="32dp"
+        android:paddingStart="12dp"
         android:autofillHints="emailAddress"
-        android:backgroundTint="@color/white"
+        android:drawableStart="@drawable/custom_email_icon"
+        android:drawablePadding="8dp"
+        android:background="@drawable/custom_input"
         android:ems="10"
         android:hint="@string/email_hint"
+        android:textColorHint="@android:color/darker_gray"
         android:inputType="textEmailAddress"
-        android:minHeight="48dp"
-        android:textColor="@android:color/white"
+        android:minHeight="60dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView"
-        tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
+        tools:ignore="RtlSymmetry,TextContrastCheck,VisualLintTextFieldSize" />
 
-    <EditText
-        android:id="@+id/passwordEditText"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
-        android:autofillHints="password"
-        android:backgroundTint="@color/white"
-        android:ems="10"
-        android:hint="@string/password_hint"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailEditText"
-        tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
+        android:textColorHint="@android:color/darker_gray"
+        android:minHeight="60dp"
+        app:passwordToggleEnabled="true"
+        android:textSize="16sp"
+        app:passwordToggleTint="@android:color/darker_gray"
+        app:hintEnabled="false"
+        app:layout_constraintTop_toBottomOf="@+id/emailEditText">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:autofillHints="password"
+            android:drawableStart="@drawable/custom_lock_icon"
+            android:drawablePadding="8dp"
+            android:background="@drawable/custom_input"
+            android:ems="10"
+            android:hint="@string/password_hint"
+            android:textColorHint="@android:color/darker_gray"
+            android:inputType="textPassword"
+            android:minHeight="60dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/emailEditText"
+            tools:ignore="RtlSymmetry,VisualLintTextFieldSize" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/loginButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="90dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="90dp"
-        android:backgroundTint="@color/celeste"
+        android:background="@drawable/shadow"
         android:text="@string/login_button"
         android:textColor="@color/white"
         android:textSize="18sp"
@@ -72,17 +116,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordEditText"
+        app:layout_constraintTop_toBottomOf="@+id/passwordInputLayout"
         tools:ignore="TextContrastCheck,VisualLintButtonSize" />
 
     <Button
         android:id="@+id/signUpButton"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="90dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="90dp"
-        android:backgroundTint="@color/celeste"
+        android:background="@drawable/shadow_registrar"
         android:text="@string/singUp_button"
         android:textColor="@color/white"
         android:textSize="18sp"
@@ -94,15 +138,16 @@
 
     <ImageButton
         android:id="@+id/btnSocial"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_marginTop="32dp"
-        android:backgroundTint="@color/white"
-        android:scaleType="fitCenter"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
         android:src="@drawable/google"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signUpButton"
-        android:contentDescription="@string/image_description2"/>
+        android:contentDescription="@string/image_description2"
+        tools:ignore="VisualLintBounds" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

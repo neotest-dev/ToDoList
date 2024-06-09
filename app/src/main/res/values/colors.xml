@@ -2,8 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="hint">#808080</color>
-    <color name="azul_claro">#ADD8E6</color>
-    <color name="azul_real">#4169E1</color>
     <color name="celeste">#03A9F4</color>
+    <color name="azul_marino_claro">#076AA3</color>
 </resources>
