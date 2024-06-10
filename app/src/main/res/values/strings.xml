@@ -8,4 +8,5 @@
     <string name="image_description">Descripción de la imagen</string>
     <string name="image_description2">Descripción de la imagen2</string>
     <string name="default_web_client_id">350128825447-2mjhh5dhqf16qlkvtnfkp2pe6fmm9m2s.apps.googleusercontent.com</string>
+    <string name="title">ToDoList</string>
 </resources>

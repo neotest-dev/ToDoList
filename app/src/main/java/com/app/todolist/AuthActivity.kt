@@ -30,6 +30,7 @@ class AuthActivity : AppCompatActivity() {
     private val RC_SIGN_IN = 9001
     private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
+        Thread.sleep(1000)
         super.onCreate(savedInstanceState)
         setTheme(R.style.Base_Theme_ToDoList)
         enableEdgeToEdge()
