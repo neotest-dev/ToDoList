@@ -130,7 +130,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp">
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="10dp">
 
             <ImageButton
                 android:id="@+id/btnDelete"
@@ -147,7 +148,7 @@
 
             <Space
                 android:id="@+id/space"
-                android:layout_width="15dp"
+                android:layout_width="30dp"
                 android:layout_height="20dp"
                 android:layout_toStartOf="@id/btnDelete" />
 
@@ -159,7 +160,7 @@
                 android:layout_margin="1dp"
                 android:layout_marginStart="1dp"
                 android:layout_marginTop="1dp"
-                android:layout_marginEnd="31dp"
+                android:layout_marginEnd="21dp"
                 android:layout_marginBottom="1dp"
                 android:layout_toStartOf="@+id/space"
                 android:background="@android:color/transparent"

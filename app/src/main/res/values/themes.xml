@@ -1,8 +1,12 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.ToDoList" parent="Theme.AppCompat.NoActionBar">
+    <style name="Base.Theme.ToDoList" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/lavender</item>
+        <item name="colorPrimaryVariant">@color/lavender</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorAccent">@color/celeste</item>
+        <item name="android:statusBarColor" tools:targetApi="31">@color/celeste</item> <!-- Cambio de color de la barra de estado -->
     </style>
 
     <style name="Theme.ToDoList" parent="Base.Theme.ToDoList" />
