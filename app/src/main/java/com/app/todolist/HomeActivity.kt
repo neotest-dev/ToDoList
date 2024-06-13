@@ -1,6 +1,7 @@
 @file:Suppress("DEPRECATION")
 package com.app.todolist
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
@@ -37,6 +38,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.UUID
 
 
 @Suppress("NAME_SHADOWING")
@@ -47,10 +49,12 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var userArrayList: ArrayList<User>
     private lateinit var myAdapter: MyAdapter
+    @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        // Cambiar el color de la barra de estado
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
@@ -59,7 +63,7 @@ class HomeActivity : AppCompatActivity() {
 
         userArrayList = arrayListOf()
 
-        val adapter = MyAdapter(userArrayList,this)
+        val adapter = MyAdapter(userArrayList,this, resources, recyclerView)
         recyclerView.adapter = adapter
 
         cargarDatos()
@@ -80,8 +84,8 @@ class HomeActivity : AppCompatActivity() {
             insets
         }
 
-        val floatingAdd = findViewById<FloatingActionButton>(R.id.floating_agregar)
-        floatingAdd.setOnClickListener {
+        val fab: FloatingActionButton = findViewById(R.id.floating_agregar)
+        fab.setOnClickListener {
             showAddDB()
         }
     }
@@ -121,7 +125,7 @@ class HomeActivity : AppCompatActivity() {
                             userArrayList.add(it)
                         }
                     }
-                    recyclerView.adapter = MyAdapter(userArrayList,this)
+                    recyclerView.adapter = MyAdapter(userArrayList,this, resources, recyclerView)
                 }
                 .addOnFailureListener { exception ->
                     Log.e(TAG, "Error al cargar datos", exception)
@@ -249,11 +253,18 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun agregarTarea(tarea: HashMap<String, String>) {
+        // Generar un ID único para la tarea
+        val idTarea = UUID.randomUUID().toString()
+
+        // Asignar el ID único a la tarea
+        tarea["idTarea"] = idTarea
+
         // Agregar la tarea a la colección "tareas"
         db.collection("tareas")
-            .add(tarea)
-            .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "Tarea agregada con ID: ${documentReference.id}")
+            .document(idTarea)  // Usar el ID generado como ID del documento
+            .set(tarea)
+            .addOnSuccessListener {
+                Log.d(TAG, "Tarea agregada con ID: $idTarea")
                 Toast.makeText(this, "Tarea agregada", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
@@ -296,6 +307,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val TAG = "MiApp"
+        const val TAG = "MiApp"
     }
 }
