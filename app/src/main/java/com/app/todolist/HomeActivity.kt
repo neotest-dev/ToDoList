@@ -23,6 +23,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -39,10 +41,23 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private val db = FirebaseFirestore.getInstance()
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var userArrayList: ArrayList<User>
+    private lateinit var myAdapter: MyAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_home)
+
+        recyclerView = findViewById(R.id.recyclerTask)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        userArrayList = arrayListOf()
+
+        val adapter = MyAdapter(userArrayList,this)
+        recyclerView.adapter = adapter
+
+        cargarDatos()
+        enableEdgeToEdge()
 
         auth = FirebaseAuth.getInstance()
 
@@ -70,6 +85,38 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun cargarDatos() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        if (currentUser != null) {
+            val userId = currentUser.uid
+
+            db.collection("tareas")
+                .whereEqualTo("usuario_id", userId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val userArrayList = mutableListOf<User>()
+                    for (document in querySnapshot.documents) {
+                        val user = document.toObject(User::class.java)
+                        user?.let {
+                            Log.d(TAG, "Nombre: ${it.nombre}")
+                            Log.d(TAG, "Descripción: ${it.descripcion}")
+                            Log.d(TAG, "Fecha y Hora: ${it.fecha_hora}")
+                            Log.d(TAG, "Prioridad: ${it.prioridad}")
+                            userArrayList.add(it)
+                        }
+                    }
+                    recyclerView.adapter = MyAdapter(userArrayList,this)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(TAG, "Error al cargar datos", exception)
+                    Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun showAddDB() {
         val dialog = AlertDialog.Builder(this, R.style.MyAlertDialogStyle)
         val inflater = LayoutInflater.from(this)
@@ -91,19 +138,12 @@ class HomeActivity : AppCompatActivity() {
 
             val datePickerDialog = DatePickerDialog(this, R.style.DatePickerDialogStyle, { _, year, month, dayOfMonth ->
                 val timePickerDialog = TimePickerDialog(this, R.style.TimePickerDialogStyle, { _, hourOfDay, minute ->
-                    // Construir la fecha y hora seleccionadas
                     val selectedDateTime = Calendar.getInstance()
                     selectedDateTime.set(year, month, dayOfMonth, hourOfDay, minute)
-
-                    // Formatear la fecha y hora seleccionadas
                     val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
                     selectedDateTimeString = dateFormat.format(selectedDateTime.time)
-
-                    // Actualizar el contenido del TextView con la fecha y hora seleccionadas
                     dateTextView.text = selectedDateTimeString
                 }, currentHour, currentMinute, true)
-
-                // Mostrar el selector de hora después de seleccionar la fecha
                 timePickerDialog.show()
             }, currentYear, currentMonth, currentDay)
 
@@ -175,6 +215,7 @@ class HomeActivity : AppCompatActivity() {
 
                         // Agregar la tarea a Firestore
                         agregarTarea(tarea)
+                        cargarDatos()
                     } else {
                         // No se pudo obtener el usuario autenticado
                         Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
@@ -198,7 +239,7 @@ class HomeActivity : AppCompatActivity() {
             .add(tarea)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "Tarea agregada con ID: ${documentReference.id}")
-                Toast.makeText(this, "Tarea agregada correctamente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Tarea agregada", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error al agregar tarea", e)
