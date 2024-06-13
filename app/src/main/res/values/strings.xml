@@ -30,4 +30,10 @@
     <string name="txtPrioridad2">Urgente</string>
     <string name="btnEditar">EDITAR</string>
     <string name="btnEliminar">ELIMINAR</string>
+    <string name="search">search</string>
+    <string name="priority2">Prioridad</string>
+    <string name="baja">Baja</string>
+    <string name="media">Media</string>
+    <string name="urgente">Urgente</string>
+    <string name="exit">Cerrar Sesión</string>
 </resources>

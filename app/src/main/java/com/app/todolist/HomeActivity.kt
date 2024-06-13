@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -20,6 +22,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -48,6 +51,9 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
         recyclerView = findViewById(R.id.recyclerTask)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -74,14 +80,23 @@ class HomeActivity : AppCompatActivity() {
             insets
         }
 
-        val logOutButton = findViewById<ImageButton>(R.id.logOutButton)
-        logOutButton.setOnClickListener {
-            showAlert()
-        }
-
         val floatingAdd = findViewById<FloatingActionButton>(R.id.floating_agregar)
         floatingAdd.setOnClickListener {
             showAddDB()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.exit -> {
+                showAlert()
+                return true
+            } else -> super.onOptionsItemSelected(item)
         }
     }
 

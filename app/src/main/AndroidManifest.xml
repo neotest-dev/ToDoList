@@ -14,6 +14,7 @@
         tools:targetApi="31">
         <activity
             android:name=".HomeActivity"
+            android:theme="@style/Theme.ToDoList"
             android:exported="false" />
         <activity
             android:name=".AuthActivity"
