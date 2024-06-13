@@ -20,4 +20,14 @@
     </string-array>
     <string name="descbtncalendar">Descripción</string>
     <string name="selecthour">Selecciona fecha y hora</string>
+    <string name="txtNombre">Nombre:</string>
+    <string name="txtDesc">Descripción:</string>
+    <string name="txtFecha">Fecha y hora:</string>
+    <string name="txtPrioridad">Prioridad:</string>
+    <string name="txtNombre2">Jafet</string>
+    <string name="txtDesc2">Trapear</string>
+    <string name="txtFecha2">10/06/2024 19:00</string>
+    <string name="txtPrioridad2">Urgente</string>
+    <string name="btnEditar">EDITAR</string>
+    <string name="btnEliminar">ELIMINAR</string>
 </resources>

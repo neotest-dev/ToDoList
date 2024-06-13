@@ -22,7 +22,7 @@
         android:layout_marginTop="16dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/recyclerTask"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="16dp"
