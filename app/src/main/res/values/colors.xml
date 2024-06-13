@@ -4,4 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="celeste">#03A9F4</color>
     <color name="azul_marino_claro">#076AA3</color>
+    <color name="green">#00FF00</color>
+    <color name="orange">#FFA500</color>
+    <color name="red">#FF0000</color>
 </resources>
