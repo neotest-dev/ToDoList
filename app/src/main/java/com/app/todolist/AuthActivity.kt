@@ -134,7 +134,9 @@ class AuthActivity : AppCompatActivity() {
         super.onStart()
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            reload()
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 
@@ -183,19 +185,6 @@ class AuthActivity : AppCompatActivity() {
                     passwordEditText.text.clear()
                     emailEditText.requestFocus()
                 }
-            }
-        }
-    }
-
-
-    private fun reload() {
-        val user = FirebaseAuth.getInstance().currentUser
-        user?.reload()?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val updatedUser = FirebaseAuth.getInstance().currentUser
-                updateUI(updatedUser)
-            } else {
-                Toast.makeText(this, "Error al recargar la información del usuario", Toast.LENGTH_SHORT).show()
             }
         }
     }
