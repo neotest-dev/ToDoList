@@ -5,7 +5,14 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -17,6 +24,8 @@ import android.widget.ArrayAdapter
 import android.widget.CheckedTextView
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
+import androidx.appcompat.widget.SearchView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -40,9 +49,9 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.UUID
 
-
 @Suppress("NAME_SHADOWING")
 class HomeActivity : AppCompatActivity() {
+
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private val db = FirebaseFirestore.getInstance()
@@ -53,54 +62,289 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-
-        // Cambiar el color de la barra de estado
+        enableEdgeToEdge()
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
+        userArrayList = arrayListOf()
         recyclerView = findViewById(R.id.recyclerTask)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        userArrayList = arrayListOf()
-
-        val adapter = MyAdapter(userArrayList,this, resources, recyclerView)
-        recyclerView.adapter = adapter
-
-        cargarDatos()
-        enableEdgeToEdge()
-
         auth = FirebaseAuth.getInstance()
-
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
-
         googleSignInClient = GoogleSignIn.getClient(this, gso)
-
+        checkTask()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         val fab: FloatingActionButton = findViewById(R.id.floating_agregar)
         fab.setOnClickListener {
             showAddDB()
         }
+        val adapter = MyAdapter(userArrayList,this, resources, recyclerView)
+        recyclerView.adapter = adapter
+
+
+        cargarDatos()
     }
+
+    private fun checkTask() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser?.let { user ->
+            val userId = user.uid
+            val db = FirebaseFirestore.getInstance()
+            db.collection("tareas")
+                .whereEqualTo("usuario_id", userId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val numTasks = querySnapshot.size()
+                    Log.d(TAG, "Número de tareas del usuario: $numTasks")
+                    val logoImageView = findViewById<ImageView>(R.id.logoImageView)
+                    if (numTasks > 0) {
+                        logoImageView.visibility = View.GONE
+                    } else {
+                        logoImageView.visibility = View.VISIBLE
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(TAG, "Error al obtener las tareas del usuario: $exception")
+                }
+        }
+    }
+
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
+
+        val filtrarItem = menu?.findItem(R.id.filtrar)
+        if (filtrarItem != null) {
+            val filtrarTitle = SpannableString(filtrarItem.title)
+            filtrarTitle.setSpan(ForegroundColorSpan(Color.BLACK), 0, filtrarTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            filtrarTitle.setSpan(StyleSpan(Typeface.BOLD), 0, filtrarTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            filtrarTitle.setSpan(AbsoluteSizeSpan(18, true), 0, filtrarTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            filtrarItem.title = filtrarTitle
+        }
+
+        val logoutItem = menu?.findItem(R.id.exit)
+        if (logoutItem != null) {
+            val exitTitle = SpannableString(logoutItem.title)
+            exitTitle.setSpan(ForegroundColorSpan(Color.RED), 0, exitTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            exitTitle.setSpan(StyleSpan(Typeface.BOLD), 0, exitTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            exitTitle.setSpan(AbsoluteSizeSpan(18, true), 0, exitTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            logoutItem.title = exitTitle
+        }
+
+        val bajaItem = menu?.findItem(R.id.baja)
+        val mediaItem = menu?.findItem(R.id.media)
+        val urgenteItem = menu?.findItem(R.id.urgente)
+        val todasItem = menu?.findItem(R.id.todas)
+
+        // Obtener colores desde colors.xml
+        val bajaColor = ContextCompat.getColor(this, R.color.green)
+        val mediaColor = ContextCompat.getColor(this, R.color.orange)
+        val urgenteColor = ContextCompat.getColor(this, R.color.red)
+        val todasColor = ContextCompat.getColor(this, R.color.blue_electric)
+
+        // Configurar estilos de texto
+        bajaItem?.let { setMenuItemStyle(it, getString(R.string.baja), bajaColor, Typeface.BOLD) }
+        mediaItem?.let { setMenuItemStyle(it, getString(R.string.media), mediaColor, Typeface.BOLD) }
+        urgenteItem?.let { setMenuItemStyle(it, getString(R.string.urgente), urgenteColor, Typeface.BOLD) }
+        todasItem?.let { setMenuItemStyle(it, getString(R.string.Todas), todasColor, Typeface.BOLD) }
+
+        // Configurar el SearchView
+        val searchItem = menu?.findItem(R.id.search)
+        val searchView = searchItem?.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(text : String?): Boolean {
+                search(text.toString())
+                return true
+            }
+        })
+
         return true
     }
+
+    private fun setMenuItemStyle(item: MenuItem, title: String, color: Int, style: Int) {
+        val spannableTitle = SpannableString(title)
+        spannableTitle.setSpan(ForegroundColorSpan(color), 0, spannableTitle.length, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+        spannableTitle.setSpan(StyleSpan(style), 0, spannableTitle.length, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+        item.title = spannableTitle
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.exit -> {
                 showAlert()
                 return true
-            } else -> super.onOptionsItemSelected(item)
+            }
+            R.id.baja -> {
+                cargarDatosConPrioridadBaja()
+                true
+            }
+            R.id.media -> {
+                cargarDatosConPrioridadMedia()
+                true
+            }
+            R.id.urgente -> {
+                cargarDatosConPrioridadUrgente()
+                true
+            }
+            R.id.todas -> {
+                cargarDatos()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun search(searchText: String? = null) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        if (currentUser != null) {
+            val userId = currentUser.uid
+
+            db.collection("tareas")
+                .whereEqualTo("usuario_id", userId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val userArrayList = mutableListOf<User>()
+                    for (document in querySnapshot.documents) {
+                        val user = document.toObject(User::class.java)
+                        user?.let {
+                            if (searchText.isNullOrEmpty() || it.nombre.contains(searchText, ignoreCase = true)) {
+                                Log.d(TAG, "Nombre: ${it.nombre}")
+                                Log.d(TAG, "Descripción: ${it.descripcion}")
+                                Log.d(TAG, "Fecha y Hora: ${it.fecha_hora}")
+                                Log.d(TAG, "Prioridad: ${it.prioridad}")
+                                userArrayList.add(it)
+                            }
+                        }
+                    }
+                    userArrayList.sortBy { it.fecha_hora }
+                    recyclerView.adapter = MyAdapter(userArrayList, this, resources, recyclerView)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(TAG, "Error al cargar datos", exception)
+                    Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun cargarDatosConPrioridadBaja(){
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        if (currentUser != null) {
+            val userId = currentUser.uid
+
+            db.collection("tareas")
+                .whereEqualTo("usuario_id", userId)
+                .whereEqualTo("prioridad", "Baja")
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val userArrayList = mutableListOf<User>()
+                    for (document in querySnapshot.documents) {
+                        val user = document.toObject(User::class.java)
+                        user?.let {
+                            Log.d(TAG, "Nombre: ${it.nombre}")
+                            Log.d(TAG, "Descripción: ${it.descripcion}")
+                            Log.d(TAG, "Fecha y Hora: ${it.fecha_hora}")
+                            Log.d(TAG, "Prioridad: ${it.prioridad}")
+                            userArrayList.add(it)
+                        }
+                    }
+                    userArrayList.sortBy { it.fecha_hora }
+                    findViewById<ImageView>(R.id.logoImageView)
+                    recyclerView.adapter = MyAdapter(userArrayList, this, resources, recyclerView)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(TAG, "Error al cargar datos", exception)
+                    Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun cargarDatosConPrioridadMedia(){
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        if (currentUser != null) {
+            val userId = currentUser.uid
+
+            db.collection("tareas")
+                .whereEqualTo("usuario_id", userId)
+                .whereEqualTo("prioridad", "Media")
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val userArrayList = mutableListOf<User>()
+                    for (document in querySnapshot.documents) {
+                        val user = document.toObject(User::class.java)
+                        user?.let {
+                            Log.d(TAG, "Nombre: ${it.nombre}")
+                            Log.d(TAG, "Descripción: ${it.descripcion}")
+                            Log.d(TAG, "Fecha y Hora: ${it.fecha_hora}")
+                            Log.d(TAG, "Prioridad: ${it.prioridad}")
+                            userArrayList.add(it)
+                        }
+                    }
+                    userArrayList.sortBy { it.fecha_hora }
+                    findViewById<ImageView>(R.id.logoImageView)
+                    recyclerView.adapter = MyAdapter(userArrayList,this, resources, recyclerView)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(TAG, "Error al cargar datos", exception)
+                    Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun cargarDatosConPrioridadUrgente(){
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        if (currentUser != null) {
+            val userId = currentUser.uid
+
+            db.collection("tareas")
+                .whereEqualTo("usuario_id", userId)
+                .whereEqualTo("prioridad", "Urgente")
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val userArrayList = mutableListOf<User>()
+                    for (document in querySnapshot.documents) {
+                        val user = document.toObject(User::class.java)
+                        user?.let {
+                            Log.d(TAG, "Nombre: ${it.nombre}")
+                            Log.d(TAG, "Descripción: ${it.descripcion}")
+                            Log.d(TAG, "Fecha y Hora: ${it.fecha_hora}")
+                            Log.d(TAG, "Prioridad: ${it.prioridad}")
+                            userArrayList.add(it)
+                        }
+                    }
+                    userArrayList.sortBy { it.fecha_hora }
+                    findViewById<ImageView>(R.id.logoImageView)
+                    recyclerView.adapter = MyAdapter(userArrayList, this, resources, recyclerView)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(TAG, "Error al cargar datos", exception)
+                    Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -125,6 +369,8 @@ class HomeActivity : AppCompatActivity() {
                             userArrayList.add(it)
                         }
                     }
+                    userArrayList.sortBy { it.fecha_hora }
+                    findViewById<ImageView>(R.id.logoImageView)
                     recyclerView.adapter = MyAdapter(userArrayList,this, resources, recyclerView)
                 }
                 .addOnFailureListener { exception ->
@@ -234,6 +480,7 @@ class HomeActivity : AppCompatActivity() {
 
                         // Agregar la tarea a Firestore
                         agregarTarea(tarea)
+
                         cargarDatos()
                     } else {
                         // No se pudo obtener el usuario autenticado
@@ -266,11 +513,13 @@ class HomeActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 Log.d(TAG, "Tarea agregada con ID: $idTarea")
                 Toast.makeText(this, "Tarea agregada", Toast.LENGTH_SHORT).show()
+                checkTask()
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error al agregar tarea", e)
                 Toast.makeText(this, "Error al agregar tarea", Toast.LENGTH_SHORT).show()
             }
+
     }
 
 
@@ -287,7 +536,6 @@ class HomeActivity : AppCompatActivity() {
         }
         builder.show()
     }
-
     private fun signOut() {
         auth.signOut()
         googleSignInClient.signOut().addOnCompleteListener(this) {

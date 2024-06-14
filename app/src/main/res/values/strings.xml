@@ -36,4 +36,6 @@
     <string name="media">Media</string>
     <string name="urgente">Urgente</string>
     <string name="exit">Cerrar Sesión</string>
+    <string name="image_description3">Descripción de la imagen</string>
+    <string name="Todas">(Todas)</string>
 </resources>
