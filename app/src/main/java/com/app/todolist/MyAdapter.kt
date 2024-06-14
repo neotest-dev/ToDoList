@@ -1,6 +1,5 @@
 package com.app.todolist
 
-
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -15,11 +14,14 @@ import android.widget.ArrayAdapter
 import android.widget.CheckedTextView
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,11 +31,39 @@ import java.util.Locale
 
 
 @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE", "NAME_SHADOWING")
-class MyAdapter(private val userList: MutableList<User>,
-                private val context: Context,
-                private val resources: android.content.res.Resources,
-                private val recyclerView: RecyclerView):
-    RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
+class MyAdapter(
+    private var userList: MutableList<User>,
+    private val context: Context,
+    private val resources: android.content.res.Resources,
+    private val recyclerView: RecyclerView
+) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
+
+    fun updateData(newList: MutableList<User>) {
+        val oldList = ArrayList(userList)
+        userList.clear()
+        userList.addAll(newList)
+
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int {
+                return oldList.size
+            }
+
+            override fun getNewListSize(): Int {
+                return newList.size
+            }
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldList[oldItemPosition].idTarea == newList[newItemPosition].idTarea
+            }
+
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldList[oldItemPosition] == newList[newItemPosition]
+            }
+        })
+
+        diffResult.dispatchUpdatesTo(this)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAdapter.MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
@@ -42,7 +72,6 @@ class MyAdapter(private val userList: MutableList<User>,
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val user: User = userList[position]
-
         holder.name.text = user.nombre
         holder.desc.text = user.descripcion
         holder.hour.text = user.fecha_hora
@@ -77,9 +106,11 @@ class MyAdapter(private val userList: MutableList<User>,
             else -> holder.priorityIndicator.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.white))
         }
 
+
         holder.edit.setOnClickListener {
             showEditDB(user)
         }
+
         holder.delete.setOnClickListener {
             showDeleteDB(user)
         }
@@ -99,6 +130,31 @@ class MyAdapter(private val userList: MutableList<User>,
         val edit: ImageButton = itemView.findViewById(R.id.btnEdit)
         val delete: ImageButton = itemView.findViewById(R.id.btnDelete)
     }
+
+    private fun checkTareas() {
+        val logoImageView = (context as AppCompatActivity).findViewById<ImageView>(R.id.logoImageView)
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser?.let { user ->
+            val userId = user.uid
+            val db = FirebaseFirestore.getInstance()
+            db.collection("tareas")
+                .whereEqualTo("usuario_id", userId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val numTasks = querySnapshot.size()
+                    Log.d(HomeActivity.TAG, "Número de tareas del usuario: $numTasks")
+                    if (numTasks > 0) {
+                        logoImageView.visibility = View.GONE
+                    } else {
+                        logoImageView.visibility = View.VISIBLE
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(HomeActivity.TAG, "Error al obtener las tareas del usuario: $exception")
+                }
+        }
+    }
+
 
     private fun showDeleteDB(user: User){
         val builder = AlertDialog.Builder(context, R.style.MyAlertDialogStyle)
@@ -121,13 +177,14 @@ class MyAdapter(private val userList: MutableList<User>,
         val tareaId = user.idTarea
 
         // Verificar si el ID de la tarea es válido
-        if (tareaId != " ") {
+        if (tareaId.isNotBlank()) {
             // Eliminar la tarea de Firestore
             db.collection("tareas").document(tareaId)
                 .delete()
                 .addOnSuccessListener {
-                    // Tarea eliminada exitosamente
+                    Toast.makeText(context, "Tarea eliminada", Toast.LENGTH_SHORT).show()
                     cargarDatos()
+                    checkTareas() // Llama a checkTareas después de eliminar la tarea
                 }
                 .addOnFailureListener { e ->
                     // Error al eliminar la tarea
@@ -268,7 +325,7 @@ class MyAdapter(private val userList: MutableList<User>,
             db.collection("tareas").document(tareaId)
                 .update(tarea)
                 .addOnSuccessListener {
-                    // Tarea actualizada exitosamente
+                    Toast.makeText(context, "Tarea actualizada", Toast.LENGTH_SHORT).show()
                     cargarDatos()
                 }
                 .addOnFailureListener { e ->
@@ -286,6 +343,7 @@ class MyAdapter(private val userList: MutableList<User>,
 
     @SuppressLint("NotifyDataSetChanged")
     private fun cargarDatos() {
+        checkTareas()
         val db = FirebaseFirestore.getInstance()
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
@@ -306,6 +364,7 @@ class MyAdapter(private val userList: MutableList<User>,
                             userArrayList.add(it)
                         }
                     }
+                    userArrayList.sortBy { it.fecha_hora }
                     // Actualizar userList en el adaptador con los nuevos datos
                     userList.clear()
                     userList.addAll(userArrayList)
@@ -326,5 +385,5 @@ class MyAdapter(private val userList: MutableList<User>,
         private const val TAG = "MiApp"
     }
 
-}
 
+}

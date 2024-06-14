@@ -53,4 +53,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="ImageContrastCheck" />
 
+    <ImageView
+        android:id="@+id/logoImageView"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="@string/image_description3"
+        android:src="@drawable/ic_tarea"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ImageContrastCheck" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,6 +15,7 @@
             <item
                 android:title="@string/baja"
                 android:id="@+id/baja"
+                app:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
                 app:showAsAction="never"/>
             <item
                 android:title="@string/media"
@@ -23,6 +24,10 @@
             <item
                 android:title="@string/urgente"
                 android:id="@+id/urgente"
+                app:showAsAction="never"/>
+            <item
+                android:title="@string/Todas"
+                android:id="@+id/todas"
                 app:showAsAction="never"/>
         </menu>
     </item>
