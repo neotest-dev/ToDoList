@@ -38,4 +38,6 @@
     <string name="exit">Cerrar Sesión</string>
     <string name="image_description3">Descripción de la imagen</string>
     <string name="Todas">(Todas)</string>
+    <string name="checkNoti">Notificarme</string>
+    <string name="image_description4">Descripción de la imagen</string>
 </resources>
