@@ -14,13 +14,14 @@
         android:layout_height="200dp"
         android:layout_marginTop="30dp"
         android:contentDescription="@string/image_description"
-        android:src="@drawable/logo"
+        android:src="@drawable/ic_logo2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ImageContrastCheck" />
 
     <TextView
+        android:id="@+id/titleTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
@@ -43,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="32dp"
         android:paddingStart="12dp"
         android:autofillHints="emailAddress"
@@ -60,7 +61,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/titleTextView"
         tools:ignore="RtlSymmetry,TextContrastCheck,VisualLintTextFieldSize" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -142,12 +143,12 @@
         android:layout_height="120dp"
         android:layout_marginTop="32dp"
         android:background="@android:color/transparent"
+        android:contentDescription="@string/image_description2"
         android:scaleType="fitXY"
         android:src="@drawable/google"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signUpButton"
-        android:contentDescription="@string/image_description2"
-        tools:ignore="VisualLintBounds" />
+        tools:ignore="VisualLintBounds,TouchTargetSizeCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

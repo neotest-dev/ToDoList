@@ -1,10 +1,16 @@
 package com.app.todolist
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.DatePickerDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -38,6 +44,10 @@ class MyAdapter(
     private val recyclerView: RecyclerView
 ) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
+    // Códigos de solicitud para permisos
+    private val REQUEST_CODE_SCHEDULE_ALARM = 100
+    private val REQUEST_CODE_POST_NOTIFICATION = 101
+
     fun updateData(newList: MutableList<User>) {
         val oldList = ArrayList(userList)
         userList.clear()
@@ -67,6 +77,7 @@ class MyAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAdapter.MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
+        createChannel()
         return MyViewHolder(itemView)
     }
 
@@ -108,11 +119,35 @@ class MyAdapter(
 
 
         holder.edit.setOnClickListener {
+            cancelNotification(user.idTarea)
             showEditDB(user)
         }
 
         holder.delete.setOnClickListener {
+            cancelNotification(user.idTarea)
             showDeleteDB(user)
+        }
+
+        holder.btnNoti.setOnClickListener {
+            val user: User = userList[position]
+            val notificationId = user.idTarea.hashCode() // Id para las notis
+
+            // Crear intent para la notificación
+            val intent = Intent(context, AlarmNotification::class.java).apply {
+                putExtra("NOTIFICATION_TITLE", user.nombre)
+                putExtra("NOTIFICATION_DESC", user.descripcion)
+                putExtra("NOTIFICATION_DATE_TIME", user.fecha_hora)
+                putExtra("NOTIFICATION_PRIORITY", user.prioridad)
+                putExtra("NOTIFICATION_ID", notificationId) // pasamo el id
+            }
+            // Crear PendingIntent único para esta notificación
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                notificationId,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            scheduleNotification(user.nombre, user.fecha_hora, pendingIntent)
         }
     }
 
@@ -129,6 +164,61 @@ class MyAdapter(
         val priorityIndicator: View = itemView.findViewById(R.id.colorCard)
         val edit: ImageButton = itemView.findViewById(R.id.btnEdit)
         val delete: ImageButton = itemView.findViewById(R.id.btnDelete)
+        val btnNoti: ImageButton = itemView.findViewById(R.id.btnNoti)
+    }
+
+    private fun cancelNotification(userId: String) {
+        val intent = Intent(context, AlarmNotification::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            userId.hashCode(),
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(pendingIntent)
+    }
+
+    private fun createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                MyAdapter.MY_CHANNEL_ID,
+                "MySuperChannel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Descripción del canal"
+            }
+
+            val notificationManager: NotificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun scheduleNotification(
+        title: String,
+        dateTime: String,
+        pendingIntent: PendingIntent
+    ) {
+        // obtener la fecha
+        val format = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        val eventTime: Calendar = Calendar.getInstance().apply {
+            time = format.parse(dateTime)!!
+            // Restar 5 minutos
+            add(Calendar.MINUTE, -5)
+        }
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Toast.makeText(context, "El dispositivo no soporta alarmas exactas", Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, eventTime.timeInMillis, pendingIntent)
+        Toast.makeText(context, "Recordatorio agregado: $title", Toast.LENGTH_SHORT).show()
     }
 
     private fun checkTareas() {
@@ -383,7 +473,6 @@ class MyAdapter(
 
     companion object {
         private const val TAG = "MiApp"
+        const val MY_CHANNEL_ID = "myChannel"
     }
-
-
 }
