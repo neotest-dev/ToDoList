@@ -141,7 +141,7 @@
                 android:layout_margin="1dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:background="@android:color/transparent"
+                android:background="@color/transparent"
                 android:contentDescription="@string/btnEliminar"
                 android:src="@drawable/ic_delete"
                 tools:ignore="ContentDescription,ImageContrastCheck,TouchTargetSizeCheck" />
@@ -163,7 +163,7 @@
                 android:layout_marginEnd="21dp"
                 android:layout_marginBottom="1dp"
                 android:layout_toStartOf="@+id/space"
-                android:background="@android:color/transparent"
+                android:background="@color/transparent"
                 android:contentDescription="@string/btnEditar"
                 android:src="@drawable/ic_edit"
                 tools:ignore="ContentDescription,ImageContrastCheck,TouchTargetSizeCheck" />
@@ -174,15 +174,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="30dp"
                 android:layout_toStartOf="@+id/btnEdit"
-                android:background="@android:color/transparent"
+                android:background="@color/transparent"
                 android:contentDescription="@string/image_description4"
                 android:src="@drawable/ic_noti"
                 tools:ignore="ImageContrastCheck,TouchTargetSizeCheck" />
         </RelativeLayout>
-
-
-
-
 
     </LinearLayout>
 
