@@ -218,7 +218,7 @@ class MyAdapter(
             }
         }
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, eventTime.timeInMillis, pendingIntent)
-        Toast.makeText(context, "Recordatorio agregado: $title", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Recordatorio agregado:  $title", Toast.LENGTH_SHORT).show()
     }
 
     private fun checkTareas() {
