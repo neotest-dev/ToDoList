@@ -20,21 +20,29 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 
 class AuthActivity : AppCompatActivity() {
+
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 9001
     private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Thread.sleep(1000)
         super.onCreate(savedInstanceState)
         setTheme(R.style.Base_Theme_ToDoList)
         enableEdgeToEdge()
         setContentView(R.layout.activity_auth)
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        firebaseAnalytics.logEvent("app_open", null)
+
         googleSignInLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -118,6 +126,7 @@ class AuthActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "signInWithCredential:success")
+                    firebaseAnalytics.logEvent("sign_up", null)
                     Toast.makeText(this, "Bienvenido", Toast.LENGTH_SHORT).show()
                     val user = auth.currentUser
                     updateUI(user)
@@ -162,6 +171,7 @@ class AuthActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     Log.d(TAG, "signInWithEmail:success")
                     Toast.makeText(baseContext, "Bienvenido", Toast.LENGTH_SHORT).show()
+                    firebaseAnalytics.logEvent("sign_up", null)
                     val user = auth.currentUser
                     updateUI(user)
                 } else {
