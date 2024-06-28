@@ -11,4 +11,5 @@
     <color name="blue_electric">#001BFF</color>
     <color name="transparent">#00000000</color>
     <color name="hint">#AAAAAA</color>
+    <color name="app">#030F5F</color>
 </resources>

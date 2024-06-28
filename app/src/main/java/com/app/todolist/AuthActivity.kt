@@ -4,25 +4,25 @@ package com.app.todolist
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.Button
-import android.widget.EditText
-import com.google.firebase.auth.FirebaseAuth
-import android.util.Log
-import android.widget.ImageButton
-import android.widget.Toast
-import com.google.firebase.auth.FirebaseUser
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.ActivityResultLauncher
 
 class AuthActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -35,7 +35,6 @@ class AuthActivity : AppCompatActivity() {
         setTheme(R.style.Base_Theme_ToDoList)
         enableEdgeToEdge()
         setContentView(R.layout.activity_auth)
-
         googleSignInLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -168,10 +167,26 @@ class AuthActivity : AppCompatActivity() {
                 } else {
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
                     Toast.makeText(baseContext, "Datos incorrectos", Toast.LENGTH_SHORT).show()
+                    // Aquí intentamos enviar un correo de restablecimiento de contraseña
+                    sendPasswordResetEmail(email)
                     updateUI(null)
                 }
             }
     }
+
+    private fun sendPasswordResetEmail(email: String) {
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d(TAG, "Email sent.")
+                    Toast.makeText(baseContext, "Correo de restablecimiento enviado", Toast.LENGTH_SHORT).show()
+                } else {
+                    Log.w(TAG, "sendPasswordResetEmail:failure", task.exception)
+                    Toast.makeText(baseContext, "Error al enviar el correo de restablecimiento", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
 
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {

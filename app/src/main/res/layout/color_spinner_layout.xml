@@ -6,7 +6,7 @@
     android:background="@color/white"
     android:padding="10dp"
     android:textColor="@color/black"
-    android:textSize="20sp"
+    android:textSize="17sp"
     android:textStyle="bold"
     tools:ignore="TextContrastCheck">
 </CheckedTextView>
