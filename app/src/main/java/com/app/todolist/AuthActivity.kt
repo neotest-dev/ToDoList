@@ -24,6 +24,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class AuthActivity : AppCompatActivity() {
 
@@ -32,6 +33,7 @@ class AuthActivity : AppCompatActivity() {
     private val RC_SIGN_IN = 9001
     private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
     private lateinit var firebaseAnalytics: FirebaseAnalytics
+    private lateinit var crashlytics: FirebaseCrashlytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Thread.sleep(1000)
@@ -41,6 +43,7 @@ class AuthActivity : AppCompatActivity() {
         setContentView(R.layout.activity_auth)
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        crashlytics = FirebaseCrashlytics.getInstance()
         firebaseAnalytics.logEvent("app_open", null)
 
         googleSignInLauncher = registerForActivityResult(
@@ -117,6 +120,7 @@ class AuthActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.w(TAG, "Google sign in failed", e)
+            crashlytics.recordException(e)
         }
     }
 
@@ -132,11 +136,18 @@ class AuthActivity : AppCompatActivity() {
                     updateUI(user)
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
+
+                    // Registrar el error en Crashlytics
+                    task.exception?.let { exception ->
+                        FirebaseCrashlytics.getInstance().recordException(exception)
+                    }
+
                     Toast.makeText(this, "Autenticación fallida", Toast.LENGTH_SHORT).show()
                     updateUI(null)
                 }
             }
     }
+
 
 
     override fun onStart() {

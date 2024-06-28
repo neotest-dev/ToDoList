@@ -53,6 +53,7 @@ import java.util.Locale
 import java.util.UUID
 import android.os.PowerManager
 import android.provider.Settings
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Suppress("NAME_SHADOWING")
 class HomeActivity : AppCompatActivity() {
@@ -66,6 +67,7 @@ class HomeActivity : AppCompatActivity() {
     private val REQUEST_CODE_NOTIFICATIONS = 123
     private val REQUEST_CODE_SCHEDULE_ALARM = 100
     private val REQUEST_CODE_POST_NOTIFICATION = 101
+    private lateinit var crashlytics: FirebaseCrashlytics
 
     @SuppressLint("InflateParams", "ObsoleteSdkInt")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +79,8 @@ class HomeActivity : AppCompatActivity() {
         userArrayList = arrayListOf()
         recyclerView = findViewById(R.id.recyclerTask)
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        crashlytics = FirebaseCrashlytics.getInstance()
 
         auth = FirebaseAuth.getInstance()
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -621,6 +625,8 @@ class HomeActivity : AppCompatActivity() {
                 } else {
                     // Mostrar un mensaje de error si algún campo está vacío
                     Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
+                    // Registrar el error en Crashlytics
+                    FirebaseCrashlytics.getInstance().log("Campos vacíos detectados al intentar cargar datos")
                 }
             }
             .setNegativeButton("Cancelar") { dialog, _ ->
