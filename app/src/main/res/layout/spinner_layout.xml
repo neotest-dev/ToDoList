@@ -3,10 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/spinner_border"
     android:drawableEnd="@drawable/spinner_arrow"
     android:padding="10dp"
     android:textColor="@color/black"
-    android:textSize="20sp"
+    android:textSize="17sp"
     android:textStyle="bold"
     tools:ignore="TextContrastCheck" />

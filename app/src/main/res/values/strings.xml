@@ -40,4 +40,5 @@
     <string name="Todas">(Todas)</string>
     <string name="checkNoti">Notificarme</string>
     <string name="image_description4">Descripción de la imagen</string>
+    <string name="version">v1.0.3</string>
 </resources>

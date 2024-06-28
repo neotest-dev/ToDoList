@@ -51,6 +51,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.UUID
+import android.os.PowerManager
+import android.provider.Settings
 
 @Suppress("NAME_SHADOWING")
 class HomeActivity : AppCompatActivity() {
@@ -65,7 +67,7 @@ class HomeActivity : AppCompatActivity() {
     private val REQUEST_CODE_SCHEDULE_ALARM = 100
     private val REQUEST_CODE_POST_NOTIFICATION = 101
 
-    @SuppressLint("InflateParams")
+    @SuppressLint("InflateParams", "ObsoleteSdkInt")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -97,22 +99,62 @@ class HomeActivity : AppCompatActivity() {
         val adapter = MyAdapter(userArrayList,this, resources, recyclerView)
         recyclerView.adapter = adapter
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setNavigationBarColor(getResources().getColor(R.color.celeste));
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val packageName = packageName
+            val pm = getSystemService(POWER_SERVICE) as PowerManager
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                showBatteryOptimizationDialog()
+            }
+        }
+
         cargarDatos()
         requestPermissionsIfNecessary()
     }
 
+    private fun showBatteryOptimizationDialog() {
+        AlertDialog.Builder(this, R.style.MyAlertDialogStyle)
+            .setTitle("Optimización de Batería")
+            .setMessage(
+                "Para que la aplicación funcione correctamente, por favor sigue los siguientes pasos:\n\n" +
+                        "1. Abre la Configuración de tu teléfono.\n" +
+                        "2. Ve a 'Todas las aplicaciones'.\n" +
+                        "3. Busca la aplicación 'ToDoList'.\n" +
+                        "4. Selecciona 'No optimizar'\n" +
+                        "5. Listo."
+            )
+            .setPositiveButton("Abrir Configuración") { _, _ ->
+                // Abre la pantalla de optimización de batería en la configuración
+                val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                startActivity(intent)
+            }
+            .setNegativeButton("Cancelar", null)
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .show()
+    }
+
+
+
     // Función para verificar y solicitar permisos
+    @SuppressLint("InlinedApi")
     private fun requestPermissionsIfNecessary() {
         if (!isScheduleExactAlarmPermissionGranted() || !isPostNotificationPermissionGranted()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val permissionsToRequest = mutableListOf<String>()
+                if (!isScheduleExactAlarmPermissionGranted()) {
+                    permissionsToRequest.add(android.Manifest.permission.SCHEDULE_EXACT_ALARM)
+                }
+                if (!isPostNotificationPermissionGranted()) {
+                    permissionsToRequest.add(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+                if (permissionsToRequest.isNotEmpty()) {
                     ActivityCompat.requestPermissions(
                         this,
-                        arrayOf(
-                            android.Manifest.permission.SCHEDULE_EXACT_ALARM,
-                            android.Manifest.permission.POST_NOTIFICATIONS
-                        ),
-                        REQUEST_CODE_SCHEDULE_ALARM
+                        permissionsToRequest.toTypedArray(),
+                        REQUEST_CODE_NOTIFICATIONS
                     )
                 }
             }
@@ -127,7 +169,8 @@ class HomeActivity : AppCompatActivity() {
                 android.Manifest.permission.SCHEDULE_EXACT_ALARM
             ) == PackageManager.PERMISSION_GRANTED
         } else {
-            TODO("VERSION.SDK_INT < S")
+            // Para versiones anteriores a S, este permiso no es necesario
+            true
         }
     }
 
@@ -139,7 +182,8 @@ class HomeActivity : AppCompatActivity() {
                 android.Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
         } else {
-            TODO("VERSION.SDK_INT < TIRAMISU")
+            // Para versiones anteriores a TIRAMISU, este permiso no es necesario
+            true
         }
     }
 
@@ -151,7 +195,13 @@ class HomeActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when (requestCode) {
-            REQUEST_CODE_SCHEDULE_ALARM, REQUEST_CODE_POST_NOTIFICATION -> {
+            REQUEST_CODE_NOTIFICATIONS -> {
+                // Manejo de permisos concedidos o denegados
+                if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                    // Todos los permisos fueron concedidos
+                } else {
+                    // Al menos uno de los permisos fue denegado
+                }
             }
         }
     }
@@ -190,7 +240,7 @@ class HomeActivity : AppCompatActivity() {
             val filtrarTitle = SpannableString(filtrarItem.title)
             filtrarTitle.setSpan(ForegroundColorSpan(Color.BLACK), 0, filtrarTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             filtrarTitle.setSpan(StyleSpan(Typeface.BOLD), 0, filtrarTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            filtrarTitle.setSpan(AbsoluteSizeSpan(18, true), 0, filtrarTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            filtrarTitle.setSpan(AbsoluteSizeSpan(15, true), 0, filtrarTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             filtrarItem.title = filtrarTitle
         }
 
@@ -199,7 +249,7 @@ class HomeActivity : AppCompatActivity() {
             val exitTitle = SpannableString(logoutItem.title)
             exitTitle.setSpan(ForegroundColorSpan(Color.RED), 0, exitTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             exitTitle.setSpan(StyleSpan(Typeface.BOLD), 0, exitTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            exitTitle.setSpan(AbsoluteSizeSpan(18, true), 0, exitTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            exitTitle.setSpan(AbsoluteSizeSpan(15, true), 0, exitTitle.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             logoutItem.title = exitTitle
         }
 
