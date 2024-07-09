@@ -1,4 +1,4 @@
-package com.app.todolist
+package com.azflodev.todolist
 
 data class User(
     val idTarea: String = "",

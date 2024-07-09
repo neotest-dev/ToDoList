@@ -3,15 +3,29 @@
   <component name="AppInsightsSettings">
     <option name="tabSettings">
       <map>
+        <entry key="Android Vitals">
+          <value>
+            <InsightsFilterSettings>
+              <option name="connection">
+                <ConnectionSetting>
+                  <option name="appId" value="com.azflodev.todolist" />
+                </ConnectionSetting>
+              </option>
+              <option name="signal" value="SIGNAL_UNSPECIFIED" />
+              <option name="timeIntervalDays" value="SEVEN_DAYS" />
+              <option name="visibilityType" value="ALL" />
+            </InsightsFilterSettings>
+          </value>
+        </entry>
         <entry key="Firebase Crashlytics">
           <value>
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.app.todolist" />
-                  <option name="mobileSdkAppId" value="1:350128825447:android:5a6b13cb29285189dda0c2" />
-                  <option name="projectId" value="todolist-e481f" />
-                  <option name="projectNumber" value="350128825447" />
+                  <option name="appId" value="com.azflodev.todolist" />
+                  <option name="mobileSdkAppId" value="1:155152186990:android:9ced71c926b52ae380707f" />
+                  <option name="projectId" value="todolist-dda4f" />
+                  <option name="projectNumber" value="155152186990" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

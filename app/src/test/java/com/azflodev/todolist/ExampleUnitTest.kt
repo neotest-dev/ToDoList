@@ -1,4 +1,4 @@
-package com.app.todolist
+package com.azflodev.todolist
 
 import org.junit.Test
 

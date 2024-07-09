@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.app.todolist
+package com.azflodev.todolist
 
 import android.content.Intent
 import android.os.Bundle
