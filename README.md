@@ -5,6 +5,16 @@
 
 ---
 
+Por seguridad, este repositorio **no incluye el archivo** `google-services.json`.
+
+Para ejecutar correctamente la app:
+
+1. Ingresa a [Firebase Console](https://console.firebase.google.com/)
+2. Crea un nuevo proyecto (o usa uno existente)
+3. Agrega una app Android (usa el mismo `applicationId` que el del proyecto)
+4. Descarga el archivo `google-services.json`
+5. Coloca el archivo en la carpeta `/app` del proyecto
+
 ## 🚀 Funcionalidades
 
 ✔️ Registro e inicio de sesión con **correo y Google**  
@@ -42,7 +52,6 @@
 
 ## 📸 Capturas de Pantalla
 
-> _Agrega aquí tus imágenes o gifs mostrando tu app en acción. Por ejemplo:_
 
 | Login                            | Lista de tareas                   | Notificación                             |
 |----------------------------------|-----------------------------------|------------------------------------------|
